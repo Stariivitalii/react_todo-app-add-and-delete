@@ -1,26 +1,94 @@
 /* eslint-disable max-len */
+/* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/control-has-associated-label */
-import React from 'react';
 import { UserWarning } from './UserWarning';
-
-const USER_ID = 0;
+import { USER_ID } from './api/todos';
+import { ErrorMessages } from './components/ErrorMessages';
+import { TodoList } from './components/TodoList';
+import { StatusFilter } from './components/StatusFilter';
+import React from 'react';
+import { useTodos } from './hooks/useTodos';
 
 export const App: React.FC = () => {
+  const {
+    todosLoading,
+    errorMessage,
+    statusFilter,
+    setStatusFilter,
+    handleHideError,
+    visibleFooter,
+    filteredTodos,
+    activeTodos,
+    completedTodos,
+    todoDelete,
+  } = useTodos();
+
   if (!USER_ID) {
     return <UserWarning />;
   }
 
   return (
-    <section className="section container">
-      <p className="title is-4">
-        Copy all you need from the prev task:
-        <br />
-        <a href="https://github.com/mate-academy/react_todo-app-loading-todos#react-todo-app-load-todos">
-          React Todo App - Load Todos
-        </a>
-      </p>
+    <div className="todoapp">
+      <h1 className="todoapp__title">todos</h1>
 
-      <p className="subtitle">Styles are already copied</p>
-    </section>
+      <div className="todoapp__content">
+        <header className="todoapp__header">
+          {/* this button should have `active` class only if all todos are completed */}
+          <button
+            type="button"
+            className="todoapp__toggle-all active"
+            data-cy="ToggleAllButton"
+          />
+
+          {/* Add a todo on form submit */}
+          <form>
+            <input
+              data-cy="NewTodoField"
+              type="text"
+              className="todoapp__new-todo"
+              placeholder="What needs to be done?"
+            />
+          </form>
+        </header>
+        {!todosLoading && (
+          <>
+            <section className="todoapp__main" data-cy="TodoList">
+              {filteredTodos.map(todo => (
+                <TodoList
+                  key={todo.id}
+                  todo={todo}
+                  onTodoDelete={() => todoDelete(todo.id)}
+                />
+              ))}
+            </section>
+
+            {visibleFooter && (
+              <footer className="todoapp__footer" data-cy="Footer">
+                <span className="todo-count" data-cy="TodosCounter">
+                  {activeTodos} items left
+                </span>
+
+                <StatusFilter
+                  statusFilter={statusFilter}
+                  onStatusFilter={setStatusFilter}
+                />
+                <button
+                  type="button"
+                  className="todoapp__clear-completed"
+                  data-cy="ClearCompletedButton"
+                  disabled={completedTodos.length === 0}
+                >
+                  Clear completed
+                </button>
+              </footer>
+            )}
+          </>
+        )}
+      </div>
+      <ErrorMessages
+        errorMessage={errorMessage}
+        onHideError={handleHideError}
+      />
+    </div>
   );
 };

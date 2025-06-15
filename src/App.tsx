@@ -8,6 +8,7 @@ import { TodoList } from './components/TodoList';
 import { StatusFilter } from './components/StatusFilter';
 import React from 'react';
 import { useTodos } from './hooks/useTodos';
+import cn from 'classnames';
 
 export const App: React.FC = () => {
   const {
@@ -19,8 +20,10 @@ export const App: React.FC = () => {
     visibleFooter,
     filteredTodos,
     activeTodos,
-    completedTodos,
-    todoDelete,
+    handleTodoDelete,
+    handleDeleteAllCompletedTodos,
+    allTodosCompleted,
+    isCompletedTodos,
   } = useTodos();
 
   if (!USER_ID) {
@@ -33,10 +36,11 @@ export const App: React.FC = () => {
 
       <div className="todoapp__content">
         <header className="todoapp__header">
-          {/* this button should have `active` class only if all todos are completed */}
           <button
             type="button"
-            className="todoapp__toggle-all active"
+            className={cn('todoapp__toggle-all', {
+              active: allTodosCompleted,
+            })}
             data-cy="ToggleAllButton"
           />
 
@@ -57,7 +61,7 @@ export const App: React.FC = () => {
                 <TodoList
                   key={todo.id}
                   todo={todo}
-                  onTodoDelete={() => todoDelete(todo.id)}
+                  onTodoDelete={() => handleTodoDelete(todo.id)}
                 />
               ))}
             </section>
@@ -76,7 +80,8 @@ export const App: React.FC = () => {
                   type="button"
                   className="todoapp__clear-completed"
                   data-cy="ClearCompletedButton"
-                  disabled={completedTodos.length === 0}
+                  disabled={!isCompletedTodos}
+                  onClick={handleDeleteAllCompletedTodos}
                 >
                   Clear completed
                 </button>

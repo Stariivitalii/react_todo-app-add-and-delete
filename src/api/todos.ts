@@ -19,4 +19,8 @@ export const deleteTodos = (todoId: number) => {
   return client.delete(`/todos/${todoId}`);
 };
 
+export const addTodos = ({ userId, title, completed }: Omit<Todo, 'id'>) => {
+  return client.post<Todo>(`/todos/`, { userId, title, completed });
+};
+
 // Add more methods here

@@ -1,27 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StatusFilterOptions } from '../components/StatusFilter';
 import { Todo } from '../types/Todo';
 import * as todosService from '../api/todos';
-
-interface GetFilteredTodosFilter {
-  status: StatusFilterOptions;
-}
-
-function getFilteredTodos(todos: Todo[], filters: GetFilteredTodosFilter) {
-  let filteredTodos = [...todos];
-
-  if (filters.status !== StatusFilterOptions.all) {
-    filteredTodos = filteredTodos.filter(todo => {
-      if (filters.status === StatusFilterOptions.completed) {
-        return todo.completed;
-      } else {
-        return !todo.completed;
-      }
-    });
-  }
-
-  return filteredTodos;
-}
+import { getFilteredTodos } from '../utils/getFilteredTodos';
 
 export const useTodos = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -30,6 +11,33 @@ export const useTodos = () => {
   const [statusFilter, setStatusFilter] = useState(StatusFilterOptions.all);
 
   const handleHideError = useCallback(() => setErrorMessage(null), []);
+
+  const completedTodos = useMemo(
+    () => todos.filter(todo => todo.completed),
+    [todos],
+  );
+
+  const visibleFooter = useMemo(() => todos.length > 0, [todos]);
+
+  const filteredTodos = useMemo(
+    () => getFilteredTodos(todos, { status: statusFilter }),
+    [todos, statusFilter],
+  );
+
+  const activeTodos = useMemo(
+    () => todos.length - completedTodos.length,
+    [todos, completedTodos],
+  );
+
+  const allTodosCompleted = useMemo(
+    () => todos.length > 0 && completedTodos.length === todos.length,
+    [todos, completedTodos],
+  );
+
+  const isCompletedTodos = useMemo(
+    () => completedTodos.length > 0,
+    [completedTodos],
+  );
 
   useEffect(() => {
     todosService
@@ -41,7 +49,7 @@ export const useTodos = () => {
       .finally(() => setTodosLoading(false));
   }, []);
 
-  const todoDelete = (todoId: number) => {
+  const handleTodoDelete = (todoId: number) => {
     todosService
       .deleteTodos(todoId)
       .then(() =>
@@ -49,13 +57,29 @@ export const useTodos = () => {
           currentTodos.filter(todo => todo.id !== todoId),
         ),
       )
+      .catch(() => setErrorMessage(todosService.TodosError.unableToDelete))
+      .finally(() =>
+        setTodos(currentTodos =>
+          currentTodos.filter(todo => todo.id !== todoId),
+        ),
+      );
+  };
+
+  const handleDeleteAllCompletedTodos = () => {
+    Promise.all(completedTodos.map(todo => todosService.deleteTodos(todo.id)))
+      .then(() =>
+        setTodos(currentTodos => currentTodos.filter(todo => !todo.completed)),
+      )
       .catch(() => setErrorMessage(todosService.TodosError.unableToDelete));
   };
 
-  const visibleFooter = todos.length > 0;
-  const filteredTodos = getFilteredTodos(todos, { status: statusFilter });
-  const completedTodos = todos.filter(todo => todo.completed);
-  const activeTodos = todos.length - completedTodos.length;
+  // const todoAdd = (title: string) => {
+  //   todosService
+  //     .addTodos({ userId: todosService.USER_ID, title, completed: false })
+  //     .then(newTodo => {
+  //       return setTodos(currentTodo => [...currentTodo, newTodo]);
+  //     });
+  // };
 
   return {
     todosLoading,
@@ -66,7 +90,9 @@ export const useTodos = () => {
     visibleFooter,
     filteredTodos,
     activeTodos,
-    completedTodos,
-    todoDelete,
+    handleTodoDelete,
+    allTodosCompleted,
+    isCompletedTodos,
+    handleDeleteAllCompletedTodos,
   };
 };

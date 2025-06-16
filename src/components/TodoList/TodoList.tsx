@@ -6,15 +6,15 @@ import { CSSTransition } from 'react-transition-group';
 interface TodoListProps {
   filteredTodos: Todo[];
   handleTodoDelete: (todoId: number) => void;
-  deleteTodoIds: number | null;
   tempTodo: Todo | null;
+  todoInOperation: number[];
 }
 
 export const TodoList: React.FC<TodoListProps> = ({
   filteredTodos,
   handleTodoDelete,
-  deleteTodoIds,
   tempTodo,
+  todoInOperation,
 }) => {
   return (
     <section className="todoapp__main" data-cy="TodoList">
@@ -24,7 +24,7 @@ export const TodoList: React.FC<TodoListProps> = ({
             <TodoItem
               todo={todo}
               onTodoDelete={() => handleTodoDelete(todo.id)}
-              isProcessingDeleteTodo={deleteTodoIds === todo.id}
+              isProcessingDeleteTodo={todoInOperation.includes(todo.id)}
             />
           </CSSTransition>
         ))}

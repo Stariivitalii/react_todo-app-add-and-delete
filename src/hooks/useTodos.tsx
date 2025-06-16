@@ -9,7 +9,7 @@ export const useTodos = () => {
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState(StatusFilterOptions.all);
-  const [deleteTodoIds, setDeleteTodoIds] = useState<number | null>(null);
+  const [todoInOperation, setTodoInOperation] = useState<number[]>([]);
 
   const handleHideError = useCallback(() => setErrorMessage(null), []);
 
@@ -52,7 +52,7 @@ export const useTodos = () => {
   }, []);
 
   const handleTodoDelete = (todoId: number) => {
-    setDeleteTodoIds(todoId);
+    setTodoInOperation(current => [...current, todoId]);
 
     if (inputFocus.current) {
       inputFocus.current.disabled = true;
@@ -67,7 +67,8 @@ export const useTodos = () => {
       )
       .catch(() => setErrorMessage(todosService.TodosError.unableToDelete))
       .finally(() => {
-        setDeleteTodoIds(null);
+        setTodoInOperation(current => current.filter(id => id !== todoId));
+
         if (inputFocus.current) {
           inputFocus.current.disabled = false;
           inputFocus.current.focus();
@@ -80,18 +81,26 @@ export const useTodos = () => {
       inputFocus.current.disabled = true;
     }
 
-    Promise.all(completedTodos.map(todo => todosService.deleteTodos(todo.id)))
-      .then(() =>
-        setTodos(currentTodos => currentTodos.filter(todo => !todo.completed)),
-      )
-      .catch(() => setErrorMessage(todosService.TodosError.unableToDelete))
-      .finally(() => {
-        if (inputFocus.current) {
-          inputFocus.current.disabled = false;
-          inputFocus.current.focus();
-        }
-      });
+    Promise.allSettled(completedTodos.map(todo => handleTodoDelete(todo.id)));
   };
+
+  // const handleDeleteAllCompletedTodos = () => {
+  // if (inputFocus.current) {
+  //   inputFocus.current.disabled = true;
+  // }
+
+  //   Promise.all(completedTodos.map(todo => todosService.deleteTodos(todo.id)))
+  //     .then(() =>
+  //       setTodos(currentTodos => currentTodos.filter(todo => !todo.completed)),
+  //     )
+  //     .catch(() => setErrorMessage(todosService.TodosError.unableToDelete))
+  //     .finally(() => {
+  //       if (inputFocus.current) {
+  //         inputFocus.current.disabled = false;
+  //         inputFocus.current.focus();
+  //       }
+  //     });
+  // };
 
   const handleTodoAdd = (title: string) => {
     setTempTodo({
@@ -122,10 +131,10 @@ export const useTodos = () => {
     isCompletedTodos,
     handleTodoDelete,
     handleDeleteAllCompletedTodos,
-    deleteTodoIds,
     handleTodoAdd,
     tempTodo,
     setTempTodo,
     inputFocus,
+    todoInOperation,
   };
 };

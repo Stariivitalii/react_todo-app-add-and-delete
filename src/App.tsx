@@ -24,11 +24,11 @@ export const App: React.FC = () => {
     handleDeleteAllCompletedTodos,
     allTodosCompleted,
     isCompletedTodos,
-    deleteTodoIds,
     handleTodoAdd,
     tempTodo,
     setTempTodo,
     inputFocus,
+    todoInOperation,
   } = useTodos();
 
   if (!USER_ID) {
@@ -51,8 +51,8 @@ export const App: React.FC = () => {
         <TodoList
           filteredTodos={filteredTodos}
           handleTodoDelete={handleTodoDelete}
-          deleteTodoIds={deleteTodoIds}
           tempTodo={tempTodo}
+          todoInOperation={todoInOperation}
         />
         {visibleFooter && (
           <Footer

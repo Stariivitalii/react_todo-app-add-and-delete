@@ -1,12 +1,7 @@
 import cn from 'classnames';
 import React from 'react';
 import { Dispatch, SetStateAction } from 'react';
-
-export enum StatusFilterOptions {
-  all = 'All',
-  active = 'Active',
-  completed = 'Completed',
-}
+import { StatusFilterOptions } from '../../types/StatusFilterOptions';
 
 interface StatusFilterProps {
   statusFilter: StatusFilterOptions;

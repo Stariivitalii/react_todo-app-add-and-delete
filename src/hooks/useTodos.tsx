@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { StatusFilterOptions } from '../components/StatusFilter';
 import { Todo } from '../types/Todo';
 import * as todosService from '../api/todos';
 import { getFilteredTodos } from '../utils/getFilteredTodos';
+import { StatusFilterOptions } from '../types/StatusFilterOptions';
 
 export const useTodos = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
-  const [todosLoading, setTodosLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState(StatusFilterOptions.all);
 
@@ -45,8 +44,7 @@ export const useTodos = () => {
       .then(setTodos)
       .catch(() => {
         setErrorMessage(todosService.TodosError.unableToLoad);
-      })
-      .finally(() => setTodosLoading(false));
+      });
   }, []);
 
   const handleTodoDelete = (todoId: number) => {
@@ -73,16 +71,15 @@ export const useTodos = () => {
       .catch(() => setErrorMessage(todosService.TodosError.unableToDelete));
   };
 
-  // const todoAdd = (title: string) => {
-  //   todosService
-  //     .addTodos({ userId: todosService.USER_ID, title, completed: false })
-  //     .then(newTodo => {
-  //       return setTodos(currentTodo => [...currentTodo, newTodo]);
-  //     });
-  // };
+  const handleTodoAdd = (title: string) => {
+    todosService
+      .addTodos({ userId: todosService.USER_ID, title, completed: false })
+      .then(newTodo => {
+        return setTodos(currentTodo => [...currentTodo, newTodo]);
+      });
+  };
 
   return {
-    todosLoading,
     errorMessage,
     statusFilter,
     setStatusFilter,
@@ -94,5 +91,6 @@ export const useTodos = () => {
     allTodosCompleted,
     isCompletedTodos,
     handleDeleteAllCompletedTodos,
+    handleTodoAdd,
   };
 };

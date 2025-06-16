@@ -1,4 +1,4 @@
-import { StatusFilterOptions } from '../components/StatusFilter';
+import { StatusFilterOptions } from '../components/StatusFilter/StatusFilter';
 import { Todo } from '../types/Todo';
 
 interface GetFilteredTodosFilter {

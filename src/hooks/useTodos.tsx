@@ -6,6 +6,7 @@ import { StatusFilterOptions } from '../types/StatusFilterOptions';
 
 export const useTodos = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [tempTodo, setTempTodo] = useState<Todo | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState(StatusFilterOptions.all);
   const [deleteTodoIds, setDeleteTodoIds] = useState<number | null>(null);
@@ -70,15 +71,24 @@ export const useTodos = () => {
   };
 
   const handleTodoAdd = (title: string) => {
-    todosService
+    setTempTodo({
+      id: 0,
+      title,
+      completed: false,
+      userId: todosService.USER_ID,
+    });
+
+    return todosService
       .addTodos({ userId: todosService.USER_ID, title, completed: false })
       .then(newTodo => {
-        return setTodos(currentTodo => [...currentTodo, newTodo]);
+        setTodos(currentTodo => [...currentTodo, newTodo]);
+        setTempTodo(null);
       });
   };
 
   return {
     errorMessage,
+    setErrorMessage,
     statusFilter,
     setStatusFilter,
     handleHideError,
@@ -91,5 +101,7 @@ export const useTodos = () => {
     handleDeleteAllCompletedTodos,
     deleteTodoIds,
     handleTodoAdd,
+    tempTodo,
+    setTempTodo,
   };
 };

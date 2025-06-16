@@ -28,6 +28,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
           type="checkbox"
           className="todo__status"
           checked={todo.completed}
+          readOnly
         />
       </label>
 

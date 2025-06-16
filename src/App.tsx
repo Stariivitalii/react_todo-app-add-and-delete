@@ -13,6 +13,7 @@ import { Header } from './components/Header/Header';
 export const App: React.FC = () => {
   const {
     errorMessage,
+    setErrorMessage,
     statusFilter,
     setStatusFilter,
     handleHideError,
@@ -24,7 +25,9 @@ export const App: React.FC = () => {
     allTodosCompleted,
     isCompletedTodos,
     deleteTodoIds,
-    // handleTodoAdd,
+    handleTodoAdd,
+    tempTodo,
+    setTempTodo,
   } = useTodos();
 
   if (!USER_ID) {
@@ -36,14 +39,19 @@ export const App: React.FC = () => {
       <h1 className="todoapp__title">todos</h1>
 
       <div className="todoapp__content">
-        <Header allTodosCompleted={allTodosCompleted} />
+        <Header
+          allTodosCompleted={allTodosCompleted}
+          handleTodoAdd={handleTodoAdd}
+          setErrorMessage={setErrorMessage}
+          setTempTodo={setTempTodo}
+        />
 
         <TodoList
           filteredTodos={filteredTodos}
           handleTodoDelete={handleTodoDelete}
           deleteTodoIds={deleteTodoIds}
+          tempTodo={tempTodo}
         />
-
         {visibleFooter && (
           <Footer
             activeTodos={activeTodos}

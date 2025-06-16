@@ -28,6 +28,7 @@ export const App: React.FC = () => {
     handleTodoAdd,
     tempTodo,
     setTempTodo,
+    inputFocus,
   } = useTodos();
 
   if (!USER_ID) {
@@ -44,6 +45,7 @@ export const App: React.FC = () => {
           handleTodoAdd={handleTodoAdd}
           setErrorMessage={setErrorMessage}
           setTempTodo={setTempTodo}
+          inputFocus={inputFocus}
         />
 
         <TodoList

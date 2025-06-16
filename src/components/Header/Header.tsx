@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { Dispatch, useRef, useState } from 'react';
+import { Dispatch, useState } from 'react';
 import { TodosError } from '../../api/todos';
 import { Todo } from '../../types/Todo';
 
@@ -8,6 +8,7 @@ interface HeaderProps {
   handleTodoAdd: (title: string) => Promise<void>;
   setErrorMessage: Dispatch<React.SetStateAction<string | null>>;
   setTempTodo: Dispatch<React.SetStateAction<Todo | null>>;
+  inputFocus: React.RefObject<HTMLInputElement>;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -15,19 +16,21 @@ export const Header: React.FC<HeaderProps> = ({
   handleTodoAdd,
   setErrorMessage,
   setTempTodo,
+  inputFocus,
 }) => {
   const [title, setTitle] = useState<string>('');
-  const inputFocus = useRef<HTMLInputElement>(null);
 
   const handleChangeTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value.trimStart());
     setErrorMessage(null);
   };
 
+  const inputElement = inputFocus.current;
+
   const handleOnSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (inputFocus.current) {
-      inputFocus.current.disabled = true;
+    if (inputElement) {
+      inputElement.disabled = true;
     }
 
     const trimmedTitle = title.trim();
@@ -35,9 +38,9 @@ export const Header: React.FC<HeaderProps> = ({
     if (!trimmedTitle) {
       setErrorMessage(TodosError.titleNotEmpty);
 
-      if (inputFocus.current) {
-        inputFocus.current.disabled = false;
-        inputFocus.current.focus();
+      if (inputElement) {
+        inputElement.disabled = false;
+        inputElement.focus();
       }
 
       return;
@@ -50,9 +53,9 @@ export const Header: React.FC<HeaderProps> = ({
         setTempTodo(null);
       })
       .finally(() => {
-        if (inputFocus.current) {
-          inputFocus.current.disabled = false;
-          inputFocus.current.focus();
+        if (inputElement) {
+          inputElement.disabled = false;
+          inputElement.focus();
         }
       });
   };

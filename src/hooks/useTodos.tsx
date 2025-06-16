@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Todo } from '../types/Todo';
 import * as todosService from '../api/todos';
 import { getFilteredTodos } from '../utils/getFilteredTodos';
@@ -12,6 +12,8 @@ export const useTodos = () => {
   const [deleteTodoIds, setDeleteTodoIds] = useState<number | null>(null);
 
   const handleHideError = useCallback(() => setErrorMessage(null), []);
+
+  const inputFocus = useRef<HTMLInputElement>(null);
 
   const completedTodos = useMemo(
     () => todos.filter(todo => todo.completed),
@@ -51,6 +53,11 @@ export const useTodos = () => {
 
   const handleTodoDelete = (todoId: number) => {
     setDeleteTodoIds(todoId);
+
+    if (inputFocus.current) {
+      inputFocus.current.disabled = true;
+    }
+
     todosService
       .deleteTodos(todoId)
       .then(() =>
@@ -59,15 +66,31 @@ export const useTodos = () => {
         ),
       )
       .catch(() => setErrorMessage(todosService.TodosError.unableToDelete))
-      .finally(() => setDeleteTodoIds(null));
+      .finally(() => {
+        setDeleteTodoIds(null);
+        if (inputFocus.current) {
+          inputFocus.current.disabled = false;
+          inputFocus.current.focus();
+        }
+      });
   };
 
   const handleDeleteAllCompletedTodos = () => {
+    if (inputFocus.current) {
+      inputFocus.current.disabled = true;
+    }
+
     Promise.all(completedTodos.map(todo => todosService.deleteTodos(todo.id)))
       .then(() =>
         setTodos(currentTodos => currentTodos.filter(todo => !todo.completed)),
       )
-      .catch(() => setErrorMessage(todosService.TodosError.unableToDelete));
+      .catch(() => setErrorMessage(todosService.TodosError.unableToDelete))
+      .finally(() => {
+        if (inputFocus.current) {
+          inputFocus.current.disabled = false;
+          inputFocus.current.focus();
+        }
+      });
   };
 
   const handleTodoAdd = (title: string) => {
@@ -103,5 +126,6 @@ export const useTodos = () => {
     handleTodoAdd,
     tempTodo,
     setTempTodo,
+    inputFocus,
   };
 };

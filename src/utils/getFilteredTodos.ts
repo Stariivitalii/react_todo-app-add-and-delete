@@ -1,4 +1,3 @@
-
 import { StatusFilterOptions } from '../types/StatusFilterOptions';
 import { Todo } from '../types/Todo';
 

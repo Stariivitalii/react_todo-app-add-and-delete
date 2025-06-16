@@ -6,9 +6,14 @@ import cn from 'classnames';
 interface TodoItemProps {
   todo: Todo;
   onTodoDelete: () => void;
+  isProcessingDeleteTodo: boolean;
 }
 
-export const TodoItem: React.FC<TodoItemProps> = ({ todo, onTodoDelete }) => {
+export const TodoItem: React.FC<TodoItemProps> = ({
+  todo,
+  onTodoDelete,
+  isProcessingDeleteTodo,
+}) => {
   return (
     <div
       key={todo.id}
@@ -39,7 +44,12 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo, onTodoDelete }) => {
         ×
       </button>
 
-      <div data-cy="TodoLoader" className="modal overlay">
+      <div
+        data-cy="TodoLoader"
+        className={cn('modal', 'overlay', {
+          'is-active': isProcessingDeleteTodo,
+        })}
+      >
         <div className="modal-background has-background-white-ter" />
         <div className="loader" />
       </div>

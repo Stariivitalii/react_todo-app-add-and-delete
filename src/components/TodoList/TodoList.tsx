@@ -4,11 +4,13 @@ import { TodoItem } from '../TodoItem/TodoItem';
 interface TodoListProps {
   filteredTodos: Todo[];
   handleTodoDelete: (todoId: number) => void;
+  deleteTodoIds: number | null;
 }
 
 export const TodoList: React.FC<TodoListProps> = ({
   filteredTodos,
   handleTodoDelete,
+  deleteTodoIds,
 }) => {
   return (
     <section className="todoapp__main" data-cy="TodoList">
@@ -17,6 +19,7 @@ export const TodoList: React.FC<TodoListProps> = ({
           key={todo.id}
           todo={todo}
           onTodoDelete={() => handleTodoDelete(todo.id)}
+          isProcessingDeleteTodo={deleteTodoIds === todo.id}
         />
       ))}
     </section>

@@ -23,6 +23,7 @@ export const App: React.FC = () => {
     handleDeleteAllCompletedTodos,
     allTodosCompleted,
     isCompletedTodos,
+    deleteTodoIds,
     // handleTodoAdd,
   } = useTodos();
 
@@ -40,6 +41,7 @@ export const App: React.FC = () => {
         <TodoList
           filteredTodos={filteredTodos}
           handleTodoDelete={handleTodoDelete}
+          deleteTodoIds={deleteTodoIds}
         />
 
         {visibleFooter && (

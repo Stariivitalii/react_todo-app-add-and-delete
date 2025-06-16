@@ -8,6 +8,7 @@ export const useTodos = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState(StatusFilterOptions.all);
+  const [deleteTodoIds, setDeleteTodoIds] = useState<number | null>(null);
 
   const handleHideError = useCallback(() => setErrorMessage(null), []);
 
@@ -48,6 +49,7 @@ export const useTodos = () => {
   }, []);
 
   const handleTodoDelete = (todoId: number) => {
+    setDeleteTodoIds(todoId);
     todosService
       .deleteTodos(todoId)
       .then(() =>
@@ -56,11 +58,7 @@ export const useTodos = () => {
         ),
       )
       .catch(() => setErrorMessage(todosService.TodosError.unableToDelete))
-      .finally(() =>
-        setTodos(currentTodos =>
-          currentTodos.filter(todo => todo.id !== todoId),
-        ),
-      );
+      .finally(() => setDeleteTodoIds(null));
   };
 
   const handleDeleteAllCompletedTodos = () => {
@@ -87,10 +85,11 @@ export const useTodos = () => {
     visibleFooter,
     filteredTodos,
     activeTodos,
-    handleTodoDelete,
     allTodosCompleted,
     isCompletedTodos,
+    handleTodoDelete,
     handleDeleteAllCompletedTodos,
+    deleteTodoIds,
     handleTodoAdd,
   };
 };

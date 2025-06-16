@@ -36,22 +36,21 @@ export const App: React.FC = () => {
 
       <div className="todoapp__content">
         <Header allTodosCompleted={allTodosCompleted} />
-        <>
-          <TodoList
-            filteredTodos={filteredTodos}
-            handleTodoDelete={handleTodoDelete}
-          />
 
-          {visibleFooter && (
-            <Footer
-              activeTodos={activeTodos}
-              statusFilter={statusFilter}
-              setStatusFilter={setStatusFilter}
-              isCompletedTodos={isCompletedTodos}
-              handleDeleteAllCompletedTodos={handleDeleteAllCompletedTodos}
-            />
-          )}
-        </>
+        <TodoList
+          filteredTodos={filteredTodos}
+          handleTodoDelete={handleTodoDelete}
+        />
+
+        {visibleFooter && (
+          <Footer
+            activeTodos={activeTodos}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            isCompletedTodos={isCompletedTodos}
+            handleDeleteAllCompletedTodos={handleDeleteAllCompletedTodos}
+          />
+        )}
       </div>
       <ErrorMessages
         errorMessage={errorMessage}
